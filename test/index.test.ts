@@ -1,21 +1,33 @@
-import { Web3, core } from "web3";
-import { TemplatePlugin } from "../src";
+import { Web3, Web3Eth, core } from "web3";
+import { IPFSRegistryPlugin } from "../src";
 
-describe("TemplatePlugin Tests", () => {
-  it("should register TemplatePlugin plugin on Web3Context instance", () => {
-    const web3Context = new core.Web3Context("http://127.0.0.1:8545");
-    web3Context.registerPlugin(new TemplatePlugin());
-    expect(web3Context.template).toBeDefined();
+const ganacheTestAddress = "0x09B2Cac235689F1dd172De24D3E13DA684255DAF";
+const ganacheTestPrivateKey =
+  "0xb80507299831188c729037602e4dc688e659dbb6e75f1b72d098cc6a47b1c58b";
+
+const ganacheNodeRpc = "HTTP://127.0.0.1:7545";
+
+describe("IPFSRegistryPlugin Tests", () => {
+  it("should register IPFSRegistryPlugin plugin on Web3Context instance", () => {
+    const web3Context = new core.Web3Context(ganacheNodeRpc);
+    web3Context.registerPlugin(new IPFSRegistryPlugin());
+    expect(web3Context.ipfsRegistry).toBeDefined();
   });
 
-  describe("TemplatePlugin method tests", () => {
+  it("should register IPFSRegistryPlugin plugin on Web3Eth instance", () => {
+    const web3Eth = new Web3Eth(ganacheNodeRpc);
+    web3Eth.registerPlugin(new IPFSRegistryPlugin());
+    expect(web3Eth.ipfsRegistry).toBeDefined();
+  });
+
+  describe("IPFSRegistryPlugin method tests", () => {
     let consoleSpy: jest.SpiedFunction<typeof global.console.log>;
 
     let web3: Web3;
 
     beforeAll(() => {
-      web3 = new Web3("http://127.0.0.1:8545");
-      web3.registerPlugin(new TemplatePlugin());
+      web3 = new Web3(ganacheNodeRpc);
+      web3.registerPlugin(new IPFSRegistryPlugin());
       consoleSpy = jest.spyOn(global.console, "log").mockImplementation();
     });
 
@@ -23,9 +35,40 @@ describe("TemplatePlugin Tests", () => {
       consoleSpy.mockRestore();
     });
 
-    it("should call TempltyPlugin test method with expected param", () => {
-      web3.template.test("test-param");
-      expect(consoleSpy).toHaveBeenCalledWith("test-param");
+    it("should call IPFSRegistryPlugin listCids method with expected param", async (): Promise<void> => {
+      await web3.ipfsRegistry.listCids(ganacheTestAddress);
+      expect(consoleSpy).toHaveBeenCalledTimes(1);
+      expect(consoleSpy).toHaveBeenCalledWith([]);
+    });
+
+    describe("IPFSRegistryPlugin upload method test", () => {
+      beforeAll(() => {
+        const account = web3.eth.accounts.privateKeyToAccount(
+          ganacheTestPrivateKey,
+        );
+        web3.eth.accounts.wallet.add(account);
+      });
+
+      it("should throw an error if the file path is not valid", async () => {
+        const filePath = "./invalid-file.txt";
+
+        try {
+          await web3.ipfsRegistry.upload(filePath);
+          fail("Expected an error but got none.");
+        } catch (error) {
+          expect(error).toBeInstanceOf(Error);
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          //@ts-expect-error
+          expect(error.message).toContain("no such file or directory");
+        }
+      });
+
+      it("should upload a file to IPFS and return the CID", async () => {
+        const filePath = "src/registry_interface_abi.ts";
+        const uploadResult = await web3.ipfsRegistry.upload(filePath);
+
+        expect(uploadResult.cid).toBeDefined();
+      });
     });
   });
 });
