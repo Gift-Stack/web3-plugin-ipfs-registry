@@ -5,6 +5,7 @@ This is a plugin for uploading files into ipfs, and registering them in a smart 
 
 How to use
 ------------
+TL;DR: The `usage.ts` file has it implemented already!! 🚀
 
 1. Instantiate  `web3`
 ```javascript
