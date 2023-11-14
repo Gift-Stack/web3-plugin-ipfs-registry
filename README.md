@@ -9,11 +9,16 @@ How to use
 1. Instantiate  `web3`
 ```javascript
 const provider = new HttpProvider(
-  "https://endpoints.omniatech.io/v1/eth/sepolia/public",
+  "https://ethereum-sepolia.publicnode.com",
 );
 // const provider = new HttpProvider("HTTP://127.0.0.1:7545"); // Provider for Ganache environment
 const web3 = new Web3(provider);
 ```
+Here are a list of supported RPCs:
+```javascript
+["https://ethereum-sepolia.publicnode.com", "https://endpoints.omniatech.io/v1/eth/sepolia/public", "https://rpc.sepolia.org", "https://sepolia.gateway.tenderly.co"]
+```
+There are more rpcs [here](https://chainlist.org/chain/11155111)
 
 2. Register plugin for use
 ```javascript
