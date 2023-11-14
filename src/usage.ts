@@ -8,12 +8,12 @@ dotenv.config();
 const provider = new HttpProvider(
   "https://endpoints.omniatech.io/v1/eth/sepolia/public",
 );
-// const provider = new HttpProvider("HTTP://127.0.0.1:7545");
+// const provider = new HttpProvider("HTTP://127.0.0.1:7545"); // Provider for Ganache environment
 const web3 = new Web3(provider);
 
 web3.registerPlugin(new IPFSRegistryPlugin());
 
-const privateKey = process.env.PRIVATE_KEY as string;
+const privateKey = process.env.PRIVATE_KEY as string; // Should be replaced with one's privateKey (Or connect wallet in a client environment)
 const account = web3.eth.accounts.privateKeyToAccount(privateKey);
 web3.eth.accounts.wallet.add(account);
 

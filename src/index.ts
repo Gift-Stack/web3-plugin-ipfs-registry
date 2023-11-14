@@ -2,10 +2,8 @@ import { Contract, validator, Web3PluginBase } from "web3";
 import type { types, Web3Context } from "web3";
 
 import { uploadToIPFS } from "./utils/uploadToIPFS";
-import { abi } from "./registry_interface_abi";
+import { abi, address as contractAddress } from "./registry_interface";
 import type { UploadReturnData } from "./utils/types";
-
-export const contractAddress = "0xA683BF985BC560c5dc99e8F33f3340d1e53736EB";
 
 export class IPFSRegistryPlugin extends Web3PluginBase {
   public pluginNamespace = "ipfsRegistry";
@@ -35,7 +33,7 @@ export class IPFSRegistryPlugin extends Web3PluginBase {
         .estimateGas({ from: walletPublicKey });
 
       const contractReceipt = await this._contract.methods.store(cid).send({
-        gas: gasEstimate as unknown as string,
+        gas: String(gasEstimate),
         from: walletPublicKey,
       });
 

@@ -1,11 +1,12 @@
 import fs from "fs";
-
 import { ThirdwebStorage } from "@thirdweb-dev/storage";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const uploadToIPFS = async (file: string): Promise<string> => {
   const storage = new ThirdwebStorage({
-    secretKey:
-      "iLl0ufZKITKF77kviHO5ZtZJuUNRziuzaIa8hX6_nv9Ou-9mwoc9LMAx7IQWfXeZlBpGLIx7HwpSoEPKH9z52A",
+    secretKey: process.env.THIRD_WEB_SECRET_KEY,
   });
   try {
     // Read the file

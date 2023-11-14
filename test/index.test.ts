@@ -64,7 +64,7 @@ describe("IPFSRegistryPlugin Tests", () => {
       });
 
       it("should upload a file to IPFS and return the CID", async () => {
-        const filePath = "src/registry_interface_abi.ts";
+        const filePath = "src/registry_interface.ts";
         const uploadResult = await web3.ipfsRegistry.upload(filePath);
 
         expect(uploadResult.cid).toBeDefined();
