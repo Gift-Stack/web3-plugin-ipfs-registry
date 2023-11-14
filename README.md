@@ -1,24 +1,51 @@
-web3-plugin-template
+web3-plugin-ipfs-registry
 ===========
 
-This is a template for creating a repository for web3.js plugin.
+This is a plugin for uploading files into ipfs, and registering them in a smart contract, built with web3.js v4 plugin.
 
 How to use
 ------------
 
-1. Create your project out of this template.
+1. Instantiate  `web3`
+```javascript
+const provider = new HttpProvider(
+  "https://endpoints.omniatech.io/v1/eth/sepolia/public",
+);
+// const provider = new HttpProvider("HTTP://127.0.0.1:7545"); // Provider for Ganache environment
+const web3 = new Web3(provider);
+```
 
-    You can do so by pressing on `Use this template` on the above right corner and then select `Create new Repositor`. Please, use the convention `web3-plugin-<name>` for your repo name.
-2. Update the `name` and `description` fileds at your `package.json`.
+2. Register plugin for use
+```javascript
+web3.registerPlugin(new IPFSRegistryPlugin());
+```
 
-    Chose a name like: `@<organization>/web3-plugin-<name>` (or the less better `web3-plugin-<name>`).
-3. Update the code inside `src` folder.
+3. Call the upload function
+```javascript
+export const _upload = async (): Promise<UploadReturnData> => {
+  return await web3.ipfsRegistry.upload("src/usage.ts");
+};
+```
 
-4. Modify and add tests inside `test` folder.
+4. Fetch uploaded CIDs
+```javascript
+export const getCids = async (): Promise<void> => {
+  await web3.ipfsRegistry.listCids(
+    "0x8B90d90F2867D52878483B42bcA591F9Efe2931b",
+  );
+};
 
-5. Publish to the npm registry.
+```
 
-    You can publish with something like: `yarn build && npm publish --access public`.
+5. Run test (This runs the E2E test on both node and browser environment)
+```sql
+yarn run test:all
+```
+
+7. Run build.
+```sql
+yarn run build
+```
 
 Contributing
 ------------
