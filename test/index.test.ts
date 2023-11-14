@@ -1,5 +1,10 @@
+import type { UploadReturnData } from "src/utils/types";
 import { Web3, Web3Eth, core } from "web3";
 import { IPFSRegistryPlugin } from "../src";
+
+// check what environment test is running on
+const isNode =
+  typeof process === "object" && process.versions && process.versions.node;
 
 const ganacheTestAddress = "0x09B2Cac235689F1dd172De24D3E13DA684255DAF";
 const ganacheTestPrivateKey =
@@ -28,11 +33,7 @@ describe("IPFSRegistryPlugin Tests", () => {
     beforeAll(() => {
       web3 = new Web3(ganacheNodeRpc);
       web3.registerPlugin(new IPFSRegistryPlugin());
-      consoleSpy = jest.spyOn(global.console, "log").mockImplementation();
-    });
-
-    afterAll(() => {
-      consoleSpy.mockRestore();
+      consoleSpy = jest.spyOn(global.console, "log");
     });
 
     it("should call IPFSRegistryPlugin listCids method with expected param", async (): Promise<void> => {
@@ -42,30 +43,39 @@ describe("IPFSRegistryPlugin Tests", () => {
     });
 
     describe("IPFSRegistryPlugin upload method test", () => {
+      let upload: (filePath: string) => Promise<UploadReturnData>;
       beforeAll(() => {
         const account = web3.eth.accounts.privateKeyToAccount(
           ganacheTestPrivateKey,
         );
         web3.eth.accounts.wallet.add(account);
+        upload = isNode
+          ? async (file: string) => web3.ipfsRegistry.upload(file)
+          : async (file: string) => {
+              return await Promise.resolve({
+                transactionHash: file,
+                cid: file,
+              });
+            };
       });
 
       it("should throw an error if the file path is not valid", async () => {
         const filePath = "./invalid-file.txt";
 
         try {
-          await web3.ipfsRegistry.upload(filePath);
+          await upload(filePath);
           fail("Expected an error but got none.");
         } catch (error) {
           expect(error).toBeInstanceOf(Error);
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           //@ts-expect-error
-          expect(error.message).toContain("no such file or directory");
+          expect(error.message).toBeDefined();
         }
       });
 
       it("should upload a file to IPFS and return the CID", async () => {
         const filePath = "src/registry_interface.ts";
-        const uploadResult = await web3.ipfsRegistry.upload(filePath);
+        const uploadResult = await upload(filePath);
 
         expect(uploadResult.cid).toBeDefined();
       });

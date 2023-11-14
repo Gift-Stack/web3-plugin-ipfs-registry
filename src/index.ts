@@ -51,7 +51,7 @@ export class IPFSRegistryPlugin extends Web3PluginBase {
     try {
       if (!validator.isAddress(address)) {
         throw new Error(
-          `Provided owner address is not a valid address: ${address}`,
+          `Provided owner address is not a valid address: ${address}`
         );
       }
 
