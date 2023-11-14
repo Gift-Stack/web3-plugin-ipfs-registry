@@ -27,5 +27,5 @@ export const getCids = async (): Promise<void> => {
   );
 };
 
-void _upload().then((data) => console.log("Uploaded", data));
-void getCids().then();
+// void _upload().then((data) => console.log("Uploaded", data));
+// void getCids().then();

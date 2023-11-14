@@ -12,7 +12,7 @@ export class IPFSRegistryPlugin extends Web3PluginBase {
   public constructor() {
     super();
     this._contract = new Contract(abi, contractAddress, this);
-    this._contract.setConfig({ contractDataInputFill: "data" });
+    this._contract.setConfig({ contractDataInputFill: "both" });
   }
 
   public link(parentContext: Web3Context): void {
@@ -51,7 +51,7 @@ export class IPFSRegistryPlugin extends Web3PluginBase {
     try {
       if (!validator.isAddress(address)) {
         throw new Error(
-          `Provided owner address is not a valid address: ${address}`
+          `Provided owner address is not a valid address: ${address}`,
         );
       }
 
@@ -62,6 +62,11 @@ export class IPFSRegistryPlugin extends Web3PluginBase {
       });
       console.log(CIDStored);
     } catch (error) {
+      if ((error as Error).message === "Invalid response") {
+        throw new Error(
+          "'RPC error' please confirm you rpc provider or use a different one. Usually a result of downtime in the provider",
+        );
+      }
       throw new Error(error as string);
     }
   }
